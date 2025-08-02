@@ -1,4 +1,4 @@
-import {useWebSocket} from "./WSContext.tsx";
+import {useWebSocket} from "../contexts/WSContext.tsx";
 
 interface PushButtonProps {
     x: number;

@@ -90,6 +90,8 @@ export const PushButton = ({x, y, className}: PushButtonProps) => {
 
         const scale_factor = Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, BASE_FONT_SIZE * (TEXT_SCALE_NUMERATOR / text.length)));
 
+        // TODO: avoid breaking on words
+
         el.style.fontSize = `${scale_factor}rem`;
         el.style.lineHeight = `${scale_factor * BASE_LINE_HEIGHT}rem`; // adjust line height proportionally
     }, [text]);

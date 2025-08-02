@@ -132,3 +132,17 @@ export const useWebSocketReadyStateChange = (callback: (readyState: WebSocket["r
         };
     }, [ws]);
 }
+
+/**
+ * Hook to get the current WebSocket ready state and update when it changes.<br>
+ * This hook should be used within a component that is a child of the {@link WSProvider}.
+ * @returns the current WebSocket ready state
+ */
+export const useWebSocketReadyState = () => {
+    const ws = useWebSocket();
+    const [ready_state, setReadyState] = useState<WebSocket["readyState"]>(ws ? ws.readyState : WebSocket.CLOSED);
+
+    useWebSocketReadyStateChange(setReadyState);
+
+    return ready_state;
+}

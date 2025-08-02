@@ -1,5 +1,4 @@
-import {useCallback, useState} from "react";
-import {useWebSocketReadyStateChange} from "../../contexts/WSContext";
+import {useWebSocketReadyState} from "../../contexts/WSContext";
 
 import {CircleAlert, Unplug} from "lucide-react";
 
@@ -43,17 +42,7 @@ interface WSStatusProps {
  * @constructor
  */
 export const WSStatus = ({className}: WSStatusProps) => {
-    const [ready_state, setReadyState]  = useState<WebSocket["readyState"]>(WebSocket.CONNECTING);
-
-    const callback = useCallback(
-        (new_ready_state: WebSocket["readyState"]) => {
-            setReadyState(new_ready_state);
-        },
-        []
-    );
-
-    useWebSocketReadyStateChange(callback);
-
+    const ready_state = useWebSocketReadyState();
     const status = status_map[ready_state];
 
     return (

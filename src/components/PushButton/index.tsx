@@ -3,6 +3,8 @@ import {useEffect, useState, useCallback} from "react";
 
 import {AutoTextScale} from "../AutoTextScale";
 
+import {DynamicIcon} from "lucide-react/dynamic";
+
 import style from "./component.module.css";
 
 interface PushButtonProps {
@@ -20,6 +22,7 @@ interface PushButtonProps {
  */
 export const PushButton = ({x, y, className}: PushButtonProps) => {
     const [text, setText] = useState("");
+    const [text_is_icon, setTextIsIcon] = useState(false);
 
     const ws = useWebSocket();
 
@@ -27,6 +30,14 @@ export const PushButton = ({x, y, className}: PushButtonProps) => {
     const button_log = useCallback(
         (...msg: any[]) => {
             console.log(`[PushButton ${x},${y}]:`, ...msg);
+        },
+        [x, y]
+    );
+
+    // no prizes for guessing what this does
+    const button_error = useCallback(
+        (...msg: any[]) => {
+            console.error(`[PushButton ${x},${y}]:`, ...msg);
         },
         [x, y]
     );
@@ -40,7 +51,7 @@ export const PushButton = ({x, y, className}: PushButtonProps) => {
                     payload: {x, y}
                 }));
             } else {
-                console.error("WebSocket is not open");
+                button_error("WebSocket is not open");
             }
         },
         [ws, x, y]
@@ -59,8 +70,9 @@ export const PushButton = ({x, y, className}: PushButtonProps) => {
                     break;
                 case "set_text":
                     if (data.payload.x === x && data.payload.y === y) {
-                        button_log("Server set text:", data.payload.text);
+                        button_log("Server set text:", data.payload.text, "is icon:", data.payload.is_icon);
                         setText(data.payload.text);
+                        setTextIsIcon(data.payload.is_icon || false);
                     }
                     break;
             }
@@ -78,9 +90,29 @@ export const PushButton = ({x, y, className}: PushButtonProps) => {
         }
     }, [ws]);
 
+    let content: React.ReactNode;
+
+    // TODO: see if this can be lazy loaded, the bundle is plump with DynamicIcon!
+
+    if (text_is_icon) {
+        content = (
+            <DynamicIcon
+                // @ts-expect-error we have no realistic way to validate the icon name at compile time, so assume it's valid and catch errors at runtime
+                name={text}
+                className={style.icon}
+                fallback={
+                    // fallback to text if the icon is not found
+                    () => <AutoTextScale>{text}</AutoTextScale>
+                }
+            ></DynamicIcon>
+        );
+    } else {
+        content = <AutoTextScale>{text}</AutoTextScale>
+    }
+
     return (
         <button className={`${style.element} ${className || ""}`} onClick={handle_click}>
-            <AutoTextScale>{text}</AutoTextScale>
+            {content}
         </button>
     );
 }

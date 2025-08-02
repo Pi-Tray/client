@@ -14,3 +14,8 @@
     overflow: hidden;
     box-sizing: border-box;
 }
+
+.icon {
+    height: 50%;
+    width: auto;
+}

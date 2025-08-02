@@ -16,7 +16,7 @@ If you are developing a production application, we recommend using TypeScript wi
 1. Setup [pi-tray-server](https://github.com/obfuscatedgenerated/pi-tray-server) on the PC you want to control.
 2. Copy `.env.template` to `.env` and fill in the WebSocket URL of the server.
 3. Run `npm install` to install dependencies.
-4. Run `npm run build` to build the project.
+4. Run `npm run build-relative` to build the project for local files to store on the Pi. Use `npm run build-serve` if you want to serve the files over a web server (e.g., nginx, Apache, etc.). The built files will be in the `dist` directory.
 5. Put the built files on the Pi (or serve over the network if easier)
 6. Optionally create a new user for Pi-Tray: `sudo adduser pi-tray` `sudo usermod -G video pi-tray`
 7. Login as the user and create a new autostart file: `nano ~/.config/autostart/pi-tray.desktop`
@@ -25,7 +25,7 @@ If you are developing a production application, we recommend using TypeScript wi
 [Desktop Entry]
 Type=Application
 Name=Pi-Tray
-Exec=chromium-browser --kiosk --allow-file-access-from-files path/to/your/index.html
+Exec=chromium-browser --kiosk --allow-file-access-from-files path/to/your/dist/index.html
 Icon=chromium-browser
 Terminal=false
 ```

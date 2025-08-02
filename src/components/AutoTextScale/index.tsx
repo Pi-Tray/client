@@ -60,6 +60,7 @@ export const AutoTextScale = ({
         );
 
         // detect if a line break occurs within a word and reduce scale factor if so
+        // TODO: detection seems inconsistent on actual pi
         const words = children.split(" ");
         const has_broken_word = words.some((word) => {
             // create an invisible test element to estimate the width of the word

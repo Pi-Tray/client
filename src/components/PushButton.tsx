@@ -1,4 +1,4 @@
-import {useWebSocket} from "../contexts/WSContext.tsx";
+import {useWebSocket} from "../contexts/WSContext";
 
 interface PushButtonProps {
     x: number;
@@ -16,7 +16,6 @@ export const PushButton = ({x, y}: PushButtonProps) => {
             }));
         } else {
             console.error("WebSocket is not open");
-            // TODO: try to reconnect
         }
     };
 

@@ -6,6 +6,7 @@ import style from "./component.module.css";
 interface PushButtonProps {
     x: number;
     y: number;
+    className?: string;
 }
 
 const MIN_FONT_SIZE = 1; // minimum font size in rem
@@ -18,9 +19,10 @@ const TEXT_SCALE_NUMERATOR = 20; // numerator for scaling text size based on len
  * The button that sends a push action to the server, as well as handles server responses to update it.
  * @param x x coordinate of the button on the grid, used to identify the button in messages
  * @param y y coordinate of the button on the grid, used to identify the button in messages
+ * @param className additional class names to apply
  * @constructor
  */
-export const PushButton = ({x, y}: PushButtonProps) => {
+export const PushButton = ({x, y, className}: PushButtonProps) => {
     const button_ref = useRef<HTMLButtonElement>(null);
     const [text, setText] = useState<string>("");
 
@@ -93,7 +95,7 @@ export const PushButton = ({x, y}: PushButtonProps) => {
     }, [text]);
 
     return (
-        <button ref={button_ref} className={style.element} onClick={handle_click}>
+        <button ref={button_ref} className={`${style.element} ${className || ""}`} onClick={handle_click}>
             {text}
         </button>
     );

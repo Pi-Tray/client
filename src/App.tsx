@@ -1,6 +1,7 @@
 import {WSProvider} from "./contexts/WSContext";
-import {PushButton} from "./components/PushButton";
 import {WSStatus} from "./components/WSStatus";
+
+import {PushButtonGrid} from "./components/PushButtonGrid";
 
 import "./style/App.css";
 
@@ -11,8 +12,7 @@ export default function App() {
         <WSProvider url={ws_url}>
             <WSStatus />
 
-            <PushButton x={0} y={0} />
-            <PushButton x={1} y={0} />
+            <PushButtonGrid cols={8} rows={4} />
         </WSProvider>
     );
 }

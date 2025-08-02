@@ -95,17 +95,31 @@ export const PushButton = ({x, y, className}: PushButtonProps) => {
     // TODO: see if this can be lazy loaded, the bundle is plump with DynamicIcon!
 
     if (text_is_icon) {
-        content = (
-            <DynamicIcon
-                // @ts-expect-error we have no realistic way to validate the icon name at compile time, so assume it's valid and catch errors at runtime
-                name={text}
-                className={style.icon}
-                fallback={
-                    // fallback to text if the icon is not found
-                    () => <AutoTextScale>{text}</AutoTextScale>
-                }
-            ></DynamicIcon>
-        );
+        // if the name is "pi-tray", load our logo specially :)
+        if (text === "pi-tray") {
+            content = (
+                <img
+                    src="/icon.svg"
+                    alt="Pi Tray Logo"
+                    className={style.icon}
+                    draggable={false}
+                />
+            );
+        } else {
+            // otherwise, use DynamicIcon to load the lucide icon by name
+
+            content = (
+                <DynamicIcon
+                    // @ts-expect-error we have no realistic way to validate the icon name at compile time, so assume it's valid and catch errors at runtime
+                    name={text}
+                    className={style.icon}
+                    fallback={
+                        // fallback to text if the icon is not found
+                        () => <AutoTextScale>{text}</AutoTextScale>
+                    }
+                ></DynamicIcon>
+            );
+        }
     } else {
         content = <AutoTextScale>{text}</AutoTextScale>
     }

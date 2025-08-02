@@ -10,7 +10,9 @@ export default function App() {
     return (
         <WSProvider url={ws_url}>
             <WSStatus />
+
             <PushButton x={0} y={0} />
+            <PushButton x={1} y={0} />
         </WSProvider>
     );
 }

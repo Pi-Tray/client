@@ -1,13 +1,28 @@
-import {useWebSocket} from "../contexts/WSContext";
-import {useEffect, useState, useCallback} from "react";
+import {useWebSocket} from "../../contexts/WSContext.tsx";
+import {useEffect, useState, useCallback, useRef} from "react";
+
+import style from "./component.module.css";
 
 interface PushButtonProps {
     x: number;
     y: number;
 }
 
+const MIN_FONT_SIZE = 1; // minimum font size in rem
+const MAX_FONT_SIZE = 3; // maximum font size in rem
+const BASE_FONT_SIZE = 1; // base font size in rem, used for scaling
+const BASE_LINE_HEIGHT = 1.2; // base line height, used for scaling
+const TEXT_SCALE_NUMERATOR = 20; // numerator for scaling text size based on length
+
+/**
+ * The button that sends a push action to the server, as well as handles server responses to update it.
+ * @param x x coordinate of the button on the grid, used to identify the button in messages
+ * @param y y coordinate of the button on the grid, used to identify the button in messages
+ * @constructor
+ */
 export const PushButton = ({x, y}: PushButtonProps) => {
-    const [text, setText] = useState<string>("Push");
+    const button_ref = useRef<HTMLButtonElement>(null);
+    const [text, setText] = useState<string>("");
 
     const ws = useWebSocket();
 
@@ -66,8 +81,19 @@ export const PushButton = ({x, y}: PushButtonProps) => {
         }
     }, [ws]);
 
+    // scale font size based on content
+    useEffect(() => {
+        const el = button_ref.current;
+        if (!el) return;
+
+        const scale_factor = Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, BASE_FONT_SIZE * (TEXT_SCALE_NUMERATOR / text.length)));
+
+        el.style.fontSize = `${scale_factor}rem`;
+        el.style.lineHeight = `${scale_factor * BASE_LINE_HEIGHT}rem`; // adjust line height proportionally
+    }, [text]);
+
     return (
-        <button onClick={handle_click}>
+        <button ref={button_ref} className={style.element} onClick={handle_click}>
             {text}
         </button>
     );

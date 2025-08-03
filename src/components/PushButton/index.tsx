@@ -24,6 +24,8 @@ export const PushButton = ({x, y, className}: PushButtonProps) => {
     const [text, setText] = useState("");
     const [text_is_icon, setTextIsIcon] = useState(false);
 
+    const [result_class, setResultClass] = useState("");
+
     const ws = useWebSocket();
 
     // log function that includes button coordinates, acts just like console.log
@@ -63,9 +65,26 @@ export const PushButton = ({x, y, className}: PushButtonProps) => {
             const data = JSON.parse(event.data);
 
             switch (data.action) {
-                case "push_ack":
+                case "push_ok":
                     if (data.payload.x === x && data.payload.y === y) {
                         button_log("Server acknowledged push.");
+
+                        // mark success for 1 second
+                        setResultClass(style.success);
+                        setTimeout(() => {
+                            setResultClass("");
+                        }, 1000);
+                    }
+                    break;
+                case "push_error":
+                    if (data.payload.x === x && data.payload.y === y) {
+                        button_error("Server reported an error for push action.");
+
+                        // mark failure for 1 second
+                        setResultClass(style.failure);
+                        setTimeout(() => {
+                            setResultClass("");
+                        }, 1000);
                     }
                     break;
                 case "set_text":
@@ -125,7 +144,7 @@ export const PushButton = ({x, y, className}: PushButtonProps) => {
     }
 
     return (
-        <button className={`${style.element} ${className || ""}`} onClick={handle_click}>
+        <button className={`${style.element} ${result_class} ${className || ""}`} onClick={handle_click}>
             {content}
         </button>
     );

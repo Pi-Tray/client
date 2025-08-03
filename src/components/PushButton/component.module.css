@@ -13,9 +13,37 @@
     word-break: break-word;
     overflow: hidden;
     box-sizing: border-box;
+
+    outline-style: solid;
+    outline-width: 2px;
+    outline-color: transparent;
+
+    transition-property: background-color, color, outline-color;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-out;
 }
 
 .icon {
     height: 50%;
     width: auto;
+}
+
+.element:active {
+    background-color: #555;
+    color: #111;
+}
+
+.element.success {
+    outline-color: #2568d2;
+}
+
+.element.failure {
+    outline-color: #d22525;
+}
+
+@media (prefers-color-scheme: light) {
+    .element:active {
+        background-color: #aaa;
+        color: #fff;
+    }
 }

@@ -140,7 +140,7 @@ export const PushButton = ({x, y, className}: PushButtonProps) => {
             );
         }
     } else {
-        content = <AutoTextScale>{text}</AutoTextScale>
+        content = <AutoTextScale>{text}</AutoTextScale>;
     }
 
     return (

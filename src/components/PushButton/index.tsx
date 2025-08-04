@@ -111,36 +111,38 @@ export const PushButton = ({x, y, style, className}: PushButtonProps) => {
         }
     }, [ws]);
 
-    let content: React.ReactNode;
+    let content: React.ReactNode = null;
 
-    if (text_is_icon) {
-        // if the name is "pi-tray", load our logo specially :)
-        if (text === "pi-tray") {
-            content = (
-                <img
-                    src="/icon.svg"
-                    alt="Pi Tray Logo"
-                    className={styles.icon}
-                    draggable={false}
-                />
-            );
+    if (text) {
+        if (text_is_icon) {
+            // if the name is "pi-tray", load our logo specially :)
+            if (text === "pi-tray") {
+                content = (
+                    <img
+                        src="/icon.svg"
+                        alt="Pi Tray Logo"
+                        className={styles.icon}
+                        draggable={false}
+                    />
+                );
+            } else {
+                // otherwise, use DynamicIcon to load the lucide icon by name
+
+                content = (
+                    <DynamicIcon
+                        // @ts-expect-error we have no realistic way to validate the icon name at compile time, so assume it's valid and catch errors at runtime
+                        name={text}
+                        className={styles.icon}
+                        fallback={
+                            // fallback to text if the icon is not found
+                            () => <AutoTextScale>{text}</AutoTextScale>
+                        }
+                    ></DynamicIcon>
+                );
+            }
         } else {
-            // otherwise, use DynamicIcon to load the lucide icon by name
-
-            content = (
-                <DynamicIcon
-                    // @ts-expect-error we have no realistic way to validate the icon name at compile time, so assume it's valid and catch errors at runtime
-                    name={text}
-                    className={styles.icon}
-                    fallback={
-                        // fallback to text if the icon is not found
-                        () => <AutoTextScale>{text}</AutoTextScale>
-                    }
-                ></DynamicIcon>
-            );
+            content = <AutoTextScale>{text}</AutoTextScale>;
         }
-    } else {
-        content = <AutoTextScale>{text}</AutoTextScale>;
     }
 
     return (

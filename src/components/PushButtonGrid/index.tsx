@@ -37,6 +37,7 @@ export const PushButtonGrid = ({ rows, cols, className, button_className, reques
     // this avoids any instances of the hook order changing if the prop changes
     const request_all = useCallback(
         (state: WebSocket["readyState"]) => {
+            console.log("Requesting all buttons from server...");
             if (request_all_buttons && ws && state === WebSocket.OPEN) {
                 console.log("Requesting all buttons from server");
                 ws.send(JSON.stringify({ action: "all_buttons"}));
@@ -45,8 +46,20 @@ export const PushButtonGrid = ({ rows, cols, className, button_className, reques
         [ws, request_all_buttons]
     );
 
+    // if size changes, request all buttons again
+    // could do it smarter but this works reliably, just a bit wasteful
+    // TODO: fix this requesting twice
+    useEffect(() => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            request_all(ws.readyState);
+        }
+    }, [ws, rows, cols, request_all]);
+
     // bind request to websocket ready state change
-    useWebSocketReadyStateChange(request_all);
+    // NOTE: dont need to do this now the previous effect is in place
+    // NOTE 2: and thats really weird???
+    // TODO: this is in dire need of a refactor! or we could just tell the server to send all buttons when the grid size changes with a flag
+    //useWebSocketReadyStateChange(request_all);
 
     // TODO: fix gemini's terrible code
     // i had to do this, grid was pissing me off and this way works

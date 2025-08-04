@@ -49,6 +49,7 @@ export const PushButtonGrid = ({ rows, cols, className, button_className, reques
     // if size changes, request all buttons again
     // could do it smarter but this works reliably, just a bit wasteful
     // TODO: fix this requesting twice
+    // TODO: this is in dire need of a refactor! or we could just tell the server to send all buttons when the grid size changes with a flag
     useEffect(() => {
         if (ws && ws.readyState === WebSocket.OPEN) {
             request_all(ws.readyState);
@@ -56,10 +57,8 @@ export const PushButtonGrid = ({ rows, cols, className, button_className, reques
     }, [ws, rows, cols, request_all]);
 
     // bind request to websocket ready state change
-    // NOTE: dont need to do this now the previous effect is in place
-    // NOTE 2: and thats really weird???
-    // TODO: this is in dire need of a refactor! or we could just tell the server to send all buttons when the grid size changes with a flag
-    //useWebSocketReadyStateChange(request_all);
+    // TODO: this causes 4 requests to fire at first launch!
+    useWebSocketReadyStateChange(request_all);
 
     // TODO: fix gemini's terrible code
     // i had to do this, grid was pissing me off and this way works

@@ -15,6 +15,13 @@
   user-select: none;
 }
 
+/* if a touch screen is present, hide the mouse cursor */
+@media (hover: none) {
+    body {
+        cursor: none;
+    }
+}
+
 a {
   font-weight: 500;
   color: #646cff;

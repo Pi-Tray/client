@@ -1,4 +1,4 @@
-.wrapper {
+.element {
     aspect-ratio: 1;
     width: 7rem;
 
@@ -26,21 +26,21 @@
     width: auto;
 }
 
-.wrapper:active {
+.element:active {
     background-color: #555;
     color: #111;
 }
 
-.wrapper.success {
+.element.success {
     outline-color: #2568d2;
 }
 
-.wrapper.failure {
+.element.failure {
     outline-color: #d22525;
 }
 
 @media (prefers-color-scheme: light) {
-    .wrapper:active {
+    .element:active {
         background-color: #aaa;
         color: #fff;
     }

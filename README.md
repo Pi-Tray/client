@@ -15,7 +15,7 @@
 2. Setup [pi-tray-server](https://github.com/Pi-Tray/server) on the PC you want to control.
 3. Copy `.env.template` to `.env` and fill in the WebSocket URL of the server.
 4. Run `npm install` to install dependencies.
-5. Run `npm run build-relative` to build the project for local files to store on the Pi. Use `npm run build-serve` if you want to serve the files over a web server (e.g., nginx, Apache, etc.). The built files will be in the `dist` directory.
+5. Run `npm run build-` to build the project. The built files will be in the `dist` directory.
 6. Put the built files on the Pi (or serve over the network if easier)
 7. Optionally create a new user for Pi-Tray: `sudo adduser pi-tray` `sudo usermod -G video pi-tray`
 8. Login as the user and create a new autostart file: `nano ~/.config/autostart/pi-tray.desktop`

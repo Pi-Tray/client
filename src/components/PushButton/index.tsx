@@ -119,7 +119,7 @@ export const PushButton = ({x, y, style, className}: PushButtonProps) => {
             if (text === "pi-tray") {
                 content = (
                     <img
-                        src="/icon.svg"
+                        src={`${import.meta.env.BASE_URL}icon.svg`}
                         alt="Pi Tray Logo"
                         className={styles.icon}
                         draggable={false}

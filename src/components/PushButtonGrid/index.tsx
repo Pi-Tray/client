@@ -57,6 +57,7 @@ export const PushButtonGrid = ({ rows, cols, className, button_className, reques
     }, [ws, rows, cols, request_all]);
 
     // bind request to websocket ready state change
+    // TODO: this is a race condition
     // TODO: this causes 4 requests to fire at first launch!
     useWebSocketReadyStateChange(request_all);
 

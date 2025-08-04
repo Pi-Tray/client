@@ -5,11 +5,12 @@ import {AutoTextScale} from "../AutoTextScale";
 
 import {DynamicIcon} from "lucide-react/dynamic";
 
-import style from "./component.module.css";
+import styles from "./component.module.css";
 
 interface PushButtonProps {
     x: number;
     y: number;
+    style?: React.CSSProperties;
     className?: string;
 }
 
@@ -17,10 +18,11 @@ interface PushButtonProps {
  * The button that sends a push action to the server, as well as handles server responses to update it.
  * @param x x coordinate of the button on the grid, used to identify the button in messages
  * @param y y coordinate of the button on the grid, used to identify the button in messages
+ * @param style inline styles to apply to the button
  * @param className additional class names to apply
  * @constructor
  */
-export const PushButton = ({x, y, className}: PushButtonProps) => {
+export const PushButton = ({x, y, style, className}: PushButtonProps) => {
     const [text, setText] = useState("");
     const [text_is_icon, setTextIsIcon] = useState(false);
 
@@ -70,7 +72,7 @@ export const PushButton = ({x, y, className}: PushButtonProps) => {
                         button_log("Server acknowledged push.");
 
                         // mark success for 1 second
-                        setResultClass(style.success);
+                        setResultClass(styles.success);
                         setTimeout(() => {
                             setResultClass("");
                         }, 1000);
@@ -81,7 +83,7 @@ export const PushButton = ({x, y, className}: PushButtonProps) => {
                         button_error("Server reported an error for push action.");
 
                         // mark failure for 1 second
-                        setResultClass(style.failure);
+                        setResultClass(styles.failure);
                         setTimeout(() => {
                             setResultClass("");
                         }, 1000);
@@ -111,8 +113,6 @@ export const PushButton = ({x, y, className}: PushButtonProps) => {
 
     let content: React.ReactNode;
 
-    // TODO: see if this can be lazy loaded, the bundle is plump with DynamicIcon!
-
     if (text_is_icon) {
         // if the name is "pi-tray", load our logo specially :)
         if (text === "pi-tray") {
@@ -120,7 +120,7 @@ export const PushButton = ({x, y, className}: PushButtonProps) => {
                 <img
                     src="/icon.svg"
                     alt="Pi Tray Logo"
-                    className={style.icon}
+                    className={styles.icon}
                     draggable={false}
                 />
             );
@@ -131,7 +131,7 @@ export const PushButton = ({x, y, className}: PushButtonProps) => {
                 <DynamicIcon
                     // @ts-expect-error we have no realistic way to validate the icon name at compile time, so assume it's valid and catch errors at runtime
                     name={text}
-                    className={style.icon}
+                    className={styles.icon}
                     fallback={
                         // fallback to text if the icon is not found
                         () => <AutoTextScale>{text}</AutoTextScale>
@@ -144,7 +144,7 @@ export const PushButton = ({x, y, className}: PushButtonProps) => {
     }
 
     return (
-        <button className={`${style.element} ${result_class} ${className || ""}`} onClick={handle_click}>
+        <button style={style} className={`${styles.element} ${result_class} ${className || ""}`} onClick={handle_click}>
             {content}
         </button>
     );

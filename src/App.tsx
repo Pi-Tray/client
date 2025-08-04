@@ -12,7 +12,7 @@ export default function App() {
         <WSProvider url={ws_url}>
             <WSStatus />
 
-            <WSPushButtonGrid />
+            <WSPushButtonGrid className="grid" />
         </WSProvider>
     );
 }

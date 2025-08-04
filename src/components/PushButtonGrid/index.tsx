@@ -1,13 +1,12 @@
 import {PushButton} from "../PushButton";
 
-import {useCallback, useEffect, useState} from "react";
+import {CSSProperties, useCallback, useEffect, useRef, useState} from "react";
 
-import style from "./component.module.css";
+import styles from "./component.module.css";
 import {useWebSocket, useWebSocketReadyStateChange} from "../../contexts/WSContext.tsx";
 
 interface BasePushButtonGridProps {
     className?: string;
-    row_className?: string;
     button_className?: string;
     request_all_buttons?: boolean;
 }
@@ -22,27 +21,13 @@ interface PushButtonGridProps extends BasePushButtonGridProps {
  * @param rows number of rows in the grid
  * @param cols number of columns in the grid
  * @param className additional class names to apply
- * @param row_className additional class names to apply to each row
  * @param button_className additional class names to apply to each button
  * @param request_all_buttons whether to request all buttons from the server after rendering the grid (default: false)
  * @constructor
  */
-export const PushButtonGrid = ({ rows, cols, className, row_className, button_className, request_all_buttons }: PushButtonGridProps) => {
-    const button_rows = [];
-
-    for (let y = 0; y < rows; y++) {
-        const button_row = [];
-
-        for (let x = 0; x < cols; x++) {
-            button_row.push(<PushButton key={`${x},${y}`} x={x} y={y} className={button_className || ""} />);
-        }
-
-        button_rows.push(
-            <div key={y} className={`${style.row} ${row_className || ""}`}>
-                {button_row}
-            </div>
-        );
-    }
+export const PushButtonGrid = ({ rows, cols, className, button_className, request_all_buttons }: PushButtonGridProps) => {
+    const gridWrapperRef = useRef<HTMLDivElement>(null);
+    const [gridStyle, setGridStyle] = useState<CSSProperties>({});
 
     const ws = useWebSocket();
 
@@ -63,12 +48,77 @@ export const PushButtonGrid = ({ rows, cols, className, row_className, button_cl
     // bind request to websocket ready state change
     useWebSocketReadyStateChange(request_all);
 
-    // TODO: is grid layout better?
-    // TODO: how are we handling screen size? we probably want to maximise screen usage so maybe we need to scale up the buttons too (and adjust how text works accordingly)
+    // TODO: fix gemini's terrible code
+    // i had to do this, grid was pissing me off and this way works
+    useEffect(() => {
+        const calculateGridSize = () => {
+            if (!gridWrapperRef.current) return;
+
+            // Read the 'gap' value directly from the element's computed styles.
+            // This converts any CSS unit (rem, vw, etc.) into pixels for the calculation.
+            const gap = parseFloat(window.getComputedStyle(gridWrapperRef.current).gap) || 0;
+
+            const containerWidth = gridWrapperRef.current.clientWidth;
+            const containerHeight = gridWrapperRef.current.clientHeight;
+
+            const totalGapWidth = (cols - 1) * gap;
+            const totalGapHeight = (rows - 1) * gap;
+
+            const buttonWidthFromContainer = (containerWidth - totalGapWidth) / cols;
+            const buttonHeightFromContainer = (containerHeight - totalGapHeight) / rows;
+
+            // Use the smaller dimension to maintain a square shape
+            const buttonSize = Math.floor(Math.min(buttonWidthFromContainer, buttonHeightFromContainer));
+
+            if (buttonSize > 0) {
+                const gridWidth = cols * buttonSize + totalGapWidth;
+                const gridHeight = rows * buttonSize + totalGapHeight;
+
+                setGridStyle({
+                    display: 'grid',
+                    gridTemplateColumns: `repeat(${cols}, ${buttonSize}px)`,
+                    gridTemplateRows: `repeat(${rows}, ${buttonSize}px)`,
+                    gap: `${gap}px`,
+                    width: `${gridWidth}px`,
+                    height: `${gridHeight}px`,
+                });
+            } else {
+                // If the container is too small, hide the grid
+                setGridStyle({ display: 'none' });
+            }
+        };
+
+        calculateGridSize(); // Initial calculation
+
+        // Recalculate on resize using a ResizeObserver for performance
+        const resizeObserver = new ResizeObserver(calculateGridSize);
+        if (gridWrapperRef.current) {
+            resizeObserver.observe(gridWrapperRef.current);
+        }
+
+        // Cleanup observer
+        return () => {
+            if (gridWrapperRef.current) {
+                resizeObserver.unobserve(gridWrapperRef.current);
+            }
+        };
+    }, [rows, cols]); // Recalculate if rows or cols change
+
+    const button_grid = [];
+
+    for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+            button_grid.push(
+                <PushButton key={`${x},${y}`} x={x} y={y} className={`${styles.button} ${button_className || ""}`} />
+            );
+        }
+    }
 
     return (
-        <div className={`${style.element} ${className || ""}`}>
-            {button_rows}
+        <div ref={gridWrapperRef} className={styles.wrapper}>
+            <div style={gridStyle} className={`${styles.grid} ${className || ""}`}>
+                {button_grid}
+            </div>
         </div>
     );
 }
@@ -76,12 +126,12 @@ export const PushButtonGrid = ({ rows, cols, className, row_className, button_cl
 /**
  * Component that renders a grid of {@link PushButton} instances to a size specified by the server.<br>
  * It will also request all button data from the server after rendering the grid.
+ * @param fit whether to make buttons on the grid scale equally to fit the width of the container (default: true)
  * @param className additional class names to apply
- * @param row_className additional class names to apply to each row
  * @param button_className additional class names to apply to each button
  * @constructor
  */
-export const WSPushButtonGrid = ({ className, row_className, button_className }: BasePushButtonGridProps) => {
+export const WSPushButtonGrid = ({ className, button_className }: BasePushButtonGridProps) => {
     const [rows, setRows] = useState(null);
     const [cols, setCols] = useState(null);
 
@@ -138,7 +188,6 @@ export const WSPushButtonGrid = ({ className, row_className, button_className }:
             cols={cols}
 
             className={className}
-            row_className={row_className}
             button_className={button_className}
 
             request_all_buttons={true}

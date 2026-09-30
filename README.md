@@ -37,3 +37,5 @@
      autologin-user=pi-tray
      ```
      Save the file and exit the editor. Now, when you boot the Pi, it should automatically log in as the `pi-tray` user and start Pi-Tray in kiosk mode.
+
+todo update for trixie light, offer images

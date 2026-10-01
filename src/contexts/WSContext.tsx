@@ -9,6 +9,7 @@ interface WSProviderProps {
 }
 
 const DEFAULT_MAX_BACKOFF_MS = 30_000; // 30 seconds
+const CONNECT_TIMEOUT_MS = 5_000; // give up on a connection attempt after 5 seconds
 
 /**
  * WebSocket provider that manages a WebSocket connection and handles reconnections with exponential backoff.
@@ -33,7 +34,15 @@ export const WSProvider = ({ url, children, max_backoff_ms = DEFAULT_MAX_BACKOFF
 
         const ws = new WebSocket(url);
 
+        const connect_timeout = setTimeout(() => {
+            if (ws.readyState === WebSocket.CONNECTING) {
+                console.log(`WebSocket connection timed out after ${CONNECT_TIMEOUT_MS}ms`);
+                ws.close();
+            }
+        }, CONNECT_TIMEOUT_MS);
+
         ws.onopen = () => {
+            clearTimeout(connect_timeout);
             console.log("WebSocket connection established");
 
             // reset backoff on successful connection
@@ -45,6 +54,7 @@ export const WSProvider = ({ url, children, max_backoff_ms = DEFAULT_MAX_BACKOFF
         };
 
         ws.onclose = (event) => {
+            clearTimeout(connect_timeout);
             console.log("WebSocket connection closed", event);
 
             if (!force_closed.current) {

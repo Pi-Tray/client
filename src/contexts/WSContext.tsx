@@ -78,6 +78,14 @@ export const WSProvider = ({ url, children, max_backoff_ms = DEFAULT_MAX_BACKOFF
             console.error("WebSocket error", error);
         };
 
+        // handle reload messages
+        ws.addEventListener("message", (event) => {
+            const data = JSON.parse(event.data);
+            if (data.action === "reload") {
+                location.reload();
+            }
+        });
+
         setSocket(ws);
     }, [url, socket]);
 

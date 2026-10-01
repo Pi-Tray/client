@@ -7,6 +7,29 @@ import {DynamicIcon} from "lucide-react/dynamic";
 
 import styles from "./component.module.css";
 
+/**
+ * Resolves an asset path from the server (e.g. `/assets/<id>.png?v=123`) against the server's address.<br>
+ * Anything that would load from a different origin is rejected.
+ * @param asset_path the path from the server, or null for no image
+ * @param socket_url the websocket's url, e.g. ws://192.168.50.1:8080
+ * @returns the full http url, or an empty string for no image
+ */
+const resolve_asset_url = (asset_path: string | null | undefined, socket_url: string): string => {
+    if (!asset_path) {
+        return "";
+    }
+
+    // ws -> http and wss -> https
+    const server_base = socket_url.replace(/^ws/, "http");
+
+    try {
+        const resolved_url = new URL(asset_path, server_base);
+        return resolved_url.origin === new URL(server_base).origin ? resolved_url.href : "";
+    } catch {
+        return "";
+    }
+}
+
 interface PushButtonProps {
     x: number;
     y: number;
@@ -25,6 +48,7 @@ interface PushButtonProps {
 export const PushButton = ({x, y, style, className}: PushButtonProps) => {
     const [text, setText] = useState("");
     const [text_is_icon, setTextIsIcon] = useState(false);
+    const [background_url, setBackgroundURL] = useState("");
 
     const [result_class, setResultClass] = useState("");
 
@@ -89,11 +113,12 @@ export const PushButton = ({x, y, style, className}: PushButtonProps) => {
                         }, 1000);
                     }
                     break;
-                case "set_text":
+                case "set_cell":
                     if (data.payload.x === x && data.payload.y === y) {
-                        button_log("Server set text:", data.payload.text, "is icon:", data.payload.is_icon);
+                        button_log("Server set cell:", data.payload.text, "is icon:", data.payload.is_icon, "background:", data.payload.background);
                         setText(data.payload.text);
                         setTextIsIcon(data.payload.is_icon || false);
+                        setBackgroundURL(resolve_asset_url(data.payload.background, (event.target as WebSocket).url));
                     }
                     break;
             }
@@ -145,8 +170,13 @@ export const PushButton = ({x, y, style, className}: PushButtonProps) => {
         }
     }
 
+    // JSON.stringify quotes and escapes the url, so it can't break out of the css url()
+    const button_style: React.CSSProperties = background_url
+        ? {...style, backgroundImage: `url(${JSON.stringify(background_url)})`, backgroundSize: "cover", backgroundPosition: "center"}
+        : {...style};
+
     return (
-        <button style={style} className={`${styles.element} ${result_class} ${className || ""}`} onClick={handle_click}>
+        <button style={button_style} className={`${styles.element} ${result_class} ${className || ""}`} onClick={handle_click}>
             {content}
         </button>
     );

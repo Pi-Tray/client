@@ -183,10 +183,10 @@ export const WSPushButtonGrid = ({ className, button_className }: BasePushButton
 
         return () => {
             if (ws) {
-                ws.removeEventListener("message", () => {});
+                ws.removeEventListener("message", handle_message);
             }
         };
-    }, [ws]);
+    }, [ws, handle_message]);
 
     // when websocket becomes ready, request the grid size
     useWebSocketReadyStateChange(request_size);

@@ -50,6 +50,8 @@ export const PushButton = ({x, y, style, className}: PushButtonProps) => {
     const [text_is_icon, setTextIsIcon] = useState(false);
     const [background_url, setBackgroundURL] = useState("");
 
+    const [pushable, setPushable] = useState(true);
+
     const [result_class, setResultClass] = useState("");
 
     const ws = useWebSocket();
@@ -73,6 +75,10 @@ export const PushButton = ({x, y, style, className}: PushButtonProps) => {
     // send push action to the server when the button is clicked
     const handle_click = useCallback(
         () => {
+            if (!pushable) {
+                return;
+            }
+
             if (ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({
                     action: "push",
@@ -82,7 +88,7 @@ export const PushButton = ({x, y, style, className}: PushButtonProps) => {
                 button_error("WebSocket is not open");
             }
         },
-        [ws, x, y]
+        [ws, x, y, pushable]
     );
 
     // handle various messages from the server
@@ -119,6 +125,7 @@ export const PushButton = ({x, y, style, className}: PushButtonProps) => {
                         setText(data.payload.text);
                         setTextIsIcon(data.payload.is_icon || false);
                         setBackgroundURL(resolve_asset_url(data.payload.background, (event.target as WebSocket).url));
+                        setPushable(data.payload.pushable ?? true);
                     }
                     break;
             }
@@ -176,7 +183,7 @@ export const PushButton = ({x, y, style, className}: PushButtonProps) => {
         : {...style};
 
     return (
-        <button style={button_style} className={`${styles.element} ${result_class} ${className || ""}`} onClick={handle_click}>
+        <button style={button_style} className={`${styles.element} ${result_class} ${className || ""}`} onClick={handle_click} disabled={!pushable}>
             {content}
         </button>
     );

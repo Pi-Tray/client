@@ -31,6 +31,12 @@
     color: #111;
 }
 
+.element:disabled {
+    cursor: default;
+    pointer-events: none;
+    color: inherit;
+}
+
 .element.success {
     outline-color: #2568d2;
 }
